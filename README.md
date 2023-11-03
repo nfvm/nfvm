@@ -1,2 +1,2 @@
 # nfvm.github.io
-nfvm is an fvm library with numpy as the underlying layer.
+nfvm is an **F**inite **V**olume **M**ethod library with numpy as the underlying layer.
