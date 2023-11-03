@@ -1,0 +1,37 @@
+三角网格 triangleMesh
+==========================
+
+三角网格是应用最为广泛的网格类型之一，目前版本的nFVM仅支持三角网格。
+
+.. figure:: triangleMesh.png
+    :width: 480px
+    :alt: triangleMesh figure.
+    :align: center
+
+    三角网格
+
+
+nFVM并不具备网格生成能力，但是可以从基于meshio加载三角网格，并且仅记录网格点坐标的前两个维度信息。
+
+1. **控制体信息**
+
+triangleMesh的基本几何信息由points和cells两个numpy数组描述，前者记录所有点坐标，
+后者则记录每个三角形的顶点在points内的索引值，并且cells内的三个顶点呈现顺时针方向。
+triangleMesh中还以cell_center记录了所有三角形的重心坐标。
+
+2. **内部界面信息**
+
+有限体积法中，控制体之间的边界是非常核心的概念，2维网格中其体现为一条线段，
+在triangleMesh中所有内部面被记录在名为faces的数组内，其记录了每条边的起点和终点；
+参考openFOAM以名为owner和neighbour的数组记录其所属控制体和相邻控制体
+在cells内的索引；
+以face_center记录所有边界的中心坐标，owner_distance、neighbour_distance
+记录界面到相邻控制体中心的距离；
+以face_length和face_normal记录其长度和向控制体外侧的法线单位向量。
+
+
+3. **边界信息**
+
+边界信息被记录在boundary成员中，具体参考 :ref:`mesh_boundary` 一节。
+
+

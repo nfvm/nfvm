@@ -1,0 +1,22 @@
+mesh 子包
+================================
+
+
+1. geometry 模块
+-------------------------
+.. automodule:: geometry
+    :members:
+
+
+2. boundary 模块
+-------------------------
+.. automodule:: boundary
+    :members:
+
+3. triangleMesh 模块
+-------------------------
+.. automodule:: triangleMesh
+    :members:
+
+
+

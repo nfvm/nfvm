@@ -1,0 +1,53 @@
+ddt
+=============================
+.. 散度项的体积分可以变换为面积分：
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{ddt}
+    \int_t^{t+\Delta t} \int_V 
+    \left(\frac{\partial \phi}{\partial t} \right)_P dVdt = 
+    \left(\frac{\partial \phi}{\partial t} \right)_P \cdot V_P \cdot \Delta t
+    \end{equation}
+
+
+1. **Euler Scheme**
+
+隐式 Euler 格式中的时间项导数按如下展开
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{ddt_euler}
+    \left(\frac{\partial \phi}{\partial t} \right)_P =
+    \frac{\phi_P^n - \phi_P^o}{\Delta t}
+    \end{equation}
+
+其中上标 :math:`n` 和 :math:`o` 分别表示“new-新时间步”和“old-旧时间步”，
+式( :math:`\ref{ddt}` )中转化为
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{ddt_euler_1}
+    \int_t^{t+\Delta t} \int_V 
+    \left(\frac{\partial \phi}{\partial t} \right)_P dVdt = 
+    (\phi_P^n - \phi_P^o) \cdot V_P
+    \end{equation}
+
+由于时间项中的 :math:`\Delta t` 对方程中的所有项都共同作用，因此可以同除以此因子，得到
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{ddt_euler_2}
+    \int_t^{t+\Delta t} \int_V 
+    \left(\frac{\partial \phi}{\partial t} \right)_P dVdt 
+    \cdot \frac{1}{\Delta t} = 
+    (\phi_P^n - \phi_P^o) \cdot \frac{V_P}{\Delta t}
+    \end{equation}

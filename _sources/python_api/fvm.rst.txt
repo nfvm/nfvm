@@ -1,0 +1,20 @@
+fvm 子包
+================================
+
+
+matrix 模块
+----------------------------
+.. automodule:: matrix
+    :members:
+
+
+laplacian 模块
+----------------------------
+.. automodule:: laplacian
+    :members:    
+
+
+ddt 模块
+----------------------------
+.. automodule:: ddt
+    :members:    

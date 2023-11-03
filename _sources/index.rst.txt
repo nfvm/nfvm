@@ -1,0 +1,28 @@
+.. nfvm documentation master file, created by
+   sphinx-quickstart on Thu Sep 21 18:29:43 2023.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+nfvm's documentation!
+==================================
+nFVM是一个以numpy为底层的有限体积方法(Finite Volume Method)项目，
+项目名中的n就是取自于 `Numpy <https://numpy.org>`_ 。
+nFVM的目的是为了教学使用，目前所有的数据结构和算法均以2D情况设置。
+nFVM的设计大量借鉴了 `OpenFOAM <https://openfoam.org>`_ 项目。
+
+
+目 录
+--------------------
+.. toctree::
+   :numbered:
+   :maxdepth: 1
+
+   install/install
+   tutorial/tutorial
+   theory/theory
+   examples/examples
+   python_api/python_api
+   license
+
+   
+

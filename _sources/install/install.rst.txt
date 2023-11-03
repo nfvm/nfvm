@@ -1,0 +1,67 @@
+安装方式
+===============
+
+下载 whl 文件后安装
+--------------------------
+在whl文件所在目录下通过下面的命令安装
+
+.. code-block:: bash
+
+    pip install nfvm-0.1.0-py3-none-any.whl
+
+卸载可以通过命令
+
+.. code-block:: bash
+
+    pip uninstall nfvm
+
+
+以开发者模式使用
+--------------------------
+以开发者模式使用，相当于将源码文件夹添加到python的库搜索路径中，优点是修改源码后无需再次安装。
+安装命令为
+
+.. code-block:: bash
+
+    pip setup.py develop 
+
+卸载命令为
+
+.. code-block:: bash
+
+    # 可能因为 setuptools 模块版本问题而失败，手动删除文件夹即可
+    pip setup.py develop --uninstall
+
+
+打包为 whl 
+--------------------------
+如有必要，可以通过下述命令打包为 whl 文件
+
+.. code-block:: bash
+
+    # 安装 wheel 模块用于打包
+    pip install wheel
+
+    # --no-deps: 不下载依赖
+    # -w dist: 指定生成文件路径
+    pip wheel --no-deps  -w dist .
+
+
+依赖
+--------------------------
+
+.. csv-table:: 依赖
+    :header: "名称", "功能", "版本"
+    :widths: 15, 32, 12
+    :width: 60%
+    :align: left
+
+    "numpy",    "底层数据管理，加速计算",               ">= 1.23.2"
+    "scipy",    "稀疏矩阵相关操作",               ">= 1.9.0"
+    "h5py",     "文件存储",                         ">= 3.7.0"
+    "meshio",   "读写网格数据",                     ">= 5.3.4"
+    "matplotlib", "二维图片绘制",                   ">= 3.5.3"
+
+
+
+

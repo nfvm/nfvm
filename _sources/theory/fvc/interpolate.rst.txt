@@ -1,0 +1,69 @@
+.. _interpolate:
+
+interpolate
+=============================
+
+插值是指在基于网格中心上的体积场进行插值操作，
+得到在控制体界面上的界面场，如下图，基于点P和点N上的数值，
+计算界面中心C点的数据。
+
+.. figure:: interpolate.png
+    :width: 500px
+    :alt: interpolate figure.
+    :align: center
+
+    插值操作示意图：
+    P点N点为控制体中心，A点B点为控制体P和N的交界面，
+    点C为界面AB的中点，点D为PN连线和AB界面的交点,
+    点E和点F为点P和点N到界面AB的垂足
+
+weightted scheme
+-------------------------------
+基于权重的插值格式
+midPoint
+
+linear scheme
+-------------------------------
+高斯线性插值，插值权重为
+
+.. math::
+    :nowrap:
+
+    \begin{gather}
+    \label{interpolate_scheme}
+    \omega_{\rm{P}} = \frac{L_{\rm{NE}}}{L_{\rm{PF}} + L_{\rm{NE}}} \\
+    \omega_{\rm{N}} = 1-\omega_{\rm{P}}
+    \end{gather}
+
+
+upwind and downwind scheme
+-------------------------------
+迎风格式本质上是使用另一个界面场F来决定使用界面两侧中的哪个物理量，
+对于upwind-迎风格式，选择 :math:`F>0` 一侧。
+
+
+
+QUICK scheme
+-------------------------------
+
+
+vanLeer scheme
+-------------------------------
+
+
+Minmod scheme
+-------------------------------
+
+
+MUSCL scheme
+-------------------------------
+
+SuperBee scheme
+-------------------------------
+
+
+cubic scheme
+-------------------------------
+
+
+

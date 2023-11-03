@@ -1,0 +1,3 @@
+{
+    "path": "../../../examples/laplacian/cavity_source.ipynb"
+}

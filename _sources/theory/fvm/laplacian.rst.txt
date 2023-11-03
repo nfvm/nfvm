@@ -1,0 +1,91 @@
+laplacian
+=============================
+拉普拉斯项的体积分可以变换为面积分：
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{laplacian_1}
+    \int \nabla \cdot (\Gamma \nabla \phi) d \mathbf{V} = 
+    \int \Gamma \nabla \phi d \mathbf{S} =
+    \sum_f (\Gamma \nabla \phi )_f \cdot \mathbf{S}_f
+    \end{equation}
+
+
+因此需要以 **体数据（下标为c）** 表示 **面数据（下标为f）** 。
+一般来说，式( :math:`\ref{laplacian_1}` )中 :math:`\Gamma_f` 对应与物理场系数，
+常常可以视作常数；或变化不剧烈，可以通过显式插值得到。所以精力放在如何使用 :math:`\phi_v` 
+表示 :math:`(\nabla\phi)_f` 即可。
+
+1. **网格完全正交情况**
+
+.. figure:: laplacian_orthogonal.png
+    :width: 360px
+    :alt: laplacian orthogonal figure.
+    :align: center
+
+    正交情况
+
+
+式( :math:`\ref{laplacian_1}` )可以写为
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{laplacian_2}
+    \mathbf{S}_f \cdot (\nabla \phi)_f = 
+    \left|\mathbf{S}_f\right| \left|(\nabla \phi)_f\right|\cos \theta = 
+    \left|\mathbf{S}_f\right| 
+    \frac{\phi_P - \phi_N}{\left|\symbfit{d}\right| }
+    \end{equation}
+
+由上式，遍历 mesh 的所有内部面，便可以构造处一个稀疏矩阵 M；
+同时，由上式可以看出 laplacian 算子生成的稀疏矩阵是对称矩阵(Symmetry Matrix)，
+称其为 **对称算子** (Symmetry Operator)。
+
+
+2. **边界处理**
+
+边界条件按 :ref:`boundary` 中提到的获取了边界面上的数值，则可以将
+式( :math:`\ref{laplacian_2}` )可以写为
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{laplacian_3}
+    \mathbf{S}_f \cdot (\nabla \phi)_f = 
+    \left|\mathbf{S}_f\right|\left|(\nabla \phi)_f\right|\cos \theta = 
+    \left|\mathbf{S}_f\right| 
+    \frac{\phi_P - \phi_B}{\left|\symbfit{d}_{PB}\right|}
+    \end{equation}
+
+由上式，遍历 mesh 的所有边界面，将相应的边界控制体数据的系数记录，随后添加到稀疏矩阵M中；
+余项计算为相应数值，作为线性方程组的RHS。
+
+
+3. **网格非正交时的误差来源**
+
+.. figure:: laplacian_nonorthogonal.png
+    :width: 360px
+    :alt: laplacian nonorthogonal figure.
+    :align: center
+
+    非正交情况
+
+由图示可以看出，误差来源的本质是由PN两个控制体中心值表示的梯度
+无法描述垂直PN方向的梯度信息，网格正交情况时d⊥与界面法向量S垂直，
+两者点积为0；然而网格非正交时，点积不等于0，需要建模修正。
+
+4. **网格非正交修正**
+
+所谓修正本质就是猜测d⊥的大小。
+
+
+案例
+-------------
+:ref:`examples` 中提供了一个 **拉普拉斯求解器** 案例以供参考如何使用此算子解决扩散问题。
+
+

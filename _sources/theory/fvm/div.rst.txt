@@ -1,0 +1,28 @@
+div
+=============================
+散度项的体积分可以变换为面积分：
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{div_1}
+    \int_V \nabla \cdot \phi dV= \int_S dS \cdot \phi = \sum_f \mathbf{S} \cdot \phi_f
+    \end{equation}
+
+    \begin{equation}
+    \label{div_2}
+    \int_V \nabla \cdot (\rho\psi\phi) dV= \int_S dS \cdot (\rho\psi\phi) = \sum_f \mathbf{S} \cdot (\rho\psi)_f \phi_f = \sum_f F_f \phi_f
+    \end{equation}
+
+
+1. **Scheme**
+
+散度算子是面向对流项设计的，
+在大多数流动中对流项都对流动有非常重要的影响（参考Peclet number），
+也是NS方程求解的难点，因此发展了许多格式，这些格式可以参考显式 :ref:`interpolate` 算子；但与interpolate算子不同， 
+隐式 div 算子并不计算并导出一个标量场，而是构造一个稀疏方程组出来。
+
+2. **构造系数矩阵**
+
+

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3.4.1. 稀疏矩阵的由来 &mdash; 0.1.0</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/nfvm_32.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d786bb5c"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/translations.js?v=beaddf03"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "tags": "ams"}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="3.4.2. laplacian" href="laplacian.html" />
+    <link rel="prev" title="3.4. 隐式算子" href="fvm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #343131" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            nfvm
+              <img src="../../_static/nfvm.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install/install.html">1. 安装方式</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install/install.html#whl">1.1. 下载 whl 文件后安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install/install.html#id2">1.2. 以开发者模式使用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install/install.html#id3">1.3. 打包为 whl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install/install.html#id4">1.4. 依赖</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/tutorial.html">2. 教程</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/mesh.html">2.1. Mesh 类使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/mesh.html#导入库">2.1.1. 导入库</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/mesh.html#基于meshio从第三方网格文件加载">2.1.2. 基于meshio从第三方网格文件加载</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/mesh.html#直接从符合-nfvm-约定的-hdf5-文件-加载">2.1.3. 直接从符合 nfvm 约定的 hdf5 文件 加载</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/mesh.html#从点和网格构建">2.1.4. 从点和网格构建</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/mesh.html#复联通域下的边界">2.1.5. 复联通域下的边界</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/scalarField.html">2.2. scalarField 标量场类型使用</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/scalarField.html#构造一个体积标量场">2.2.1. 构造一个体积标量场</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/scalarField.html#插值得到一个界面标量场">2.2.2. 插值得到一个界面标量场</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/interpolate.html">2.3. interpolate 算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/flux.html">2.4. flux 算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/matrix.html">2.5. Matrix 类型</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/matrix.html#matrix-的构造">2.5.1. matrix 的构造</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/matrix.html#matrix-的保存">2.5.2. matrix 的保存</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/matrix.html#matrix-加减运算">2.5.3. matrix 加减运算</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorial/matrix.html#matrix-求解">2.5.4. matrix 求解</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../theory.html">3. 理论</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mesh/mesh.html">3.1. 网格</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mesh/triangleMesh.html">3.1.1. 三角网格 triangleMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mesh/boundary.html">3.1.2. 网格边界</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../field/field.html">3.2. 场数据</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../field/scalarField.html">3.2.1. 标量场scalarField</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../field/boundary.html">3.2.2. 边界条件的统一处理</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../fvc/fvc.html">3.3. 显式算子</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../fvc/interpolate.html">3.3.1. interpolate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#weightted-scheme">3.3.1.1. weightted scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#linear-scheme">3.3.1.2. linear scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#upwind-and-downwind-scheme">3.3.1.3. upwind and downwind scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#quick-scheme">3.3.1.4. QUICK scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#vanleer-scheme">3.3.1.5. vanLeer scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#minmod-scheme">3.3.1.6. Minmod scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#muscl-scheme">3.3.1.7. MUSCL scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#superbee-scheme">3.3.1.8. SuperBee scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/interpolate.html#cubic-scheme">3.3.1.9. cubic scheme</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../fvc/source.html">3.3.2. source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fvc/flux.html">3.3.3. flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fvc/grad.html">3.3.4. grad</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fvc/grad.html#id1">3.3.4.1. 最小二乘算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="fvm.html">3.4. 隐式算子</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.4.1. 稀疏矩阵的由来</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#加载网格">3.4.1.1. 加载网格</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#基于网格构建方稀疏矩阵">3.4.1.2. 基于网格构建方稀疏矩阵</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="laplacian.html">3.4.2. laplacian</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="laplacian.html#id1">3.4.2.1. 案例</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="div.html">3.4.3. div</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ddt.html">3.4.4. ddt</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples.html">4. 求解器案例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/laplacian/laplacian.html">4.1. Laplacian 拉普拉斯求解器</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/tri14.html">4.1.1. 少数三角网格上的算例</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/tri14.html#加载点和控制体">4.1.1.1. 加载点和控制体</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/tri14.html#构造一个温度场">4.1.1.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/tri14.html#使用拉普拉斯算子构造稀疏矩阵">4.1.1.3. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/tri14.html#求解稀疏矩阵">4.1.1.4. 求解稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/tri14.html#可视化">4.1.1.5. 可视化</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/cavity.html">4.1.2. 更多三角网格算例</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity.html#加载点和控制体">4.1.2.1. 加载点和控制体</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity.html#构造一个温度场">4.1.2.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity.html#使用拉普拉斯算子构造稀疏矩阵">4.1.2.3. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity.html#求解稀疏矩阵">4.1.2.4. 求解稀疏矩阵</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/cleveland.html">4.1.3. 俄罗斯方块 Cleveland 几何算例</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cleveland.html#加载点和控制体">4.1.3.1. 加载点和控制体</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cleveland.html#构造一个温度场">4.1.3.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cleveland.html#使用拉普拉斯算子构造稀疏矩阵">4.1.3.3. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cleveland.html#求解稀疏矩阵">4.1.3.4. 求解稀疏矩阵</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/hole.html">4.1.4. 复连通域算例</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/hole.html#加载点和控制体">4.1.4.1. 加载点和控制体</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/hole.html#构造一个温度场">4.1.4.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/hole.html#使用拉普拉斯算子构造稀疏矩阵">4.1.4.3. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/hole.html#求解稀疏矩阵">4.1.4.4. 求解稀疏矩阵</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/cavity_source.html">4.1.5. 源项热平衡问题：显式源项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_source.html#加载点和控制体">4.1.5.1. 加载点和控制体</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_source.html#构造一个温度场">4.1.5.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_source.html#构造一个源项">4.1.5.3. 构造一个源项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_source.html#使用拉普拉斯算子构造稀疏矩阵">4.1.5.4. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_source.html#求解稀疏矩阵">4.1.5.5. 求解稀疏矩阵</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/laplacian/cavity_ddt.html">4.1.6. 热扩散问题：隐式Euler时间项</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_ddt.html#定义一个网格场">4.1.6.1. 定义一个网格场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_ddt.html#构造一个温度场">4.1.6.2. 构造一个温度场</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_ddt.html#使用拉普拉斯算子构造稀疏矩阵">4.1.6.3. 使用拉普拉斯算子构造稀疏矩阵</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/laplacian/cavity_ddt.html#与OpenFoam对比">4.1.6.4. 与OpenFoam对比</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../python_api/python_api.html">5. Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../python_api/log.html">5.1. log 模块</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/log.html#log.critical"><code class="docutils literal notranslate"><span class="pre">critical()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/log.html#log.debug"><code class="docutils literal notranslate"><span class="pre">debug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/log.html#log.error"><code class="docutils literal notranslate"><span class="pre">error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/log.html#log.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/log.html#log.warn"><code class="docutils literal notranslate"><span class="pre">warn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../python_api/mesh.html">5.2. mesh 子包</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/mesh.html#geometry">5.2.1. 1. geometry 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.Point"><code class="docutils literal notranslate"><span class="pre">Point</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.clockwiseTriangle"><code class="docutils literal notranslate"><span class="pre">clockwiseTriangle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.cross_angle"><code class="docutils literal notranslate"><span class="pre">cross_angle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.face_normal"><code class="docutils literal notranslate"><span class="pre">face_normal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.line_normal"><code class="docutils literal notranslate"><span class="pre">line_normal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.point2line"><code class="docutils literal notranslate"><span class="pre">point2line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#geometry.point2point"><code class="docutils literal notranslate"><span class="pre">point2point()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/mesh.html#boundary">5.2.2. 2. boundary 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#boundary.Boundary"><code class="docutils literal notranslate"><span class="pre">Boundary</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/mesh.html#trianglemesh">5.2.3. 3. triangleMesh 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/mesh.html#triangleMesh.TriangleMesh"><code class="docutils literal notranslate"><span class="pre">TriangleMesh</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../python_api/field.html">5.3. field 子包</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/field.html#volfield">5.3.1. 1. volField 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/field.html#volField.volScalarField"><code class="docutils literal notranslate"><span class="pre">volScalarField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/field.html#volField.volVectorField"><code class="docutils literal notranslate"><span class="pre">volVectorField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/field.html#surfacefield">5.3.2. 2. surfaceField 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/field.html#surfaceField.surfaceScalarField"><code class="docutils literal notranslate"><span class="pre">surfaceScalarField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/field.html#surfaceField.surfaceVectorField"><code class="docutils literal notranslate"><span class="pre">surfaceVectorField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/field.html#boundaryfield">5.3.3. 3. boundaryField 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/field.html#boundaryField.boundaryScalarField"><code class="docutils literal notranslate"><span class="pre">boundaryScalarField</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../python_api/fvc.html">5.4. fvc 子包</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvc.html#scalarinterpolate">5.4.1. scalarInterpolate 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvc.html#scalarInterpolate.scalarInterpolate"><code class="docutils literal notranslate"><span class="pre">scalarInterpolate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvc.html#source">5.4.2. source 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvc.html#source.Source"><code class="docutils literal notranslate"><span class="pre">Source()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvc.html#flux">5.4.3. flux 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvc.html#flux.Flux"><code class="docutils literal notranslate"><span class="pre">Flux()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvc.html#grad">5.4.4. grad 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvc.html#grad.Grad"><code class="docutils literal notranslate"><span class="pre">Grad()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../python_api/fvm.html">5.5. fvm 子包</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvm.html#matrix">5.5.1. matrix 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvm.html#matrix.Matrix"><code class="docutils literal notranslate"><span class="pre">Matrix</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvm.html#laplacian">5.5.2. laplacian 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvm.html#laplacian.Laplacian"><code class="docutils literal notranslate"><span class="pre">Laplacian()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../python_api/fvm.html#ddt">5.5.3. ddt 模块</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../python_api/fvm.html#ddt.ddt"><code class="docutils literal notranslate"><span class="pre">ddt()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">6. License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单"  style="background: #343131" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nfvm</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../theory.html"><span class="section-number">3. </span>理论</a></li>
+          <li class="breadcrumb-item"><a href="fvm.html"><span class="section-number">3.4. </span>隐式算子</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">3.4.1. </span>稀疏矩阵的由来</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/theory/fvm/matrix.ipynb.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<section id="稀疏矩阵的由来">
+<h1><span class="section-number">3.4.1. </span>稀疏矩阵的由来<a class="headerlink" href="#稀疏矩阵的由来" title="Link to this heading"></a></h1>
+<section id="加载网格">
+<h2><span class="section-number">3.4.1.1. </span>加载网格<a class="headerlink" href="#加载网格" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;../../../resources/mesh/tri14/points.txt&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;../../../resources/mesh/tri14/cells.txt&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;points.shape = </span><span class="si">{</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, cells.shape = </span><span class="si">{</span><span class="n">cells</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+points.shape = (12, 2), cells.shape = (14, 3)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># center</span>
+<span class="n">CN</span> <span class="o">=</span> <span class="n">cells</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">CN</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">]</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cells</span><span class="p">):</span>
+    <span class="n">x1</span><span class="p">,</span><span class="n">y1</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x2</span><span class="p">,</span><span class="n">y2</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x3</span><span class="p">,</span><span class="n">y3</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">c</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">c</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">center</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span><span class="o">+</span><span class="n">x2</span><span class="o">+</span><span class="n">x3</span><span class="p">)</span><span class="o">/</span><span class="mf">3.0</span>
+    <span class="n">center</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">y1</span><span class="o">+</span><span class="n">y2</span><span class="o">+</span><span class="n">y3</span><span class="p">)</span><span class="o">/</span><span class="mf">3.0</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig1</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">triplot</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">cells</span><span class="p">,</span> <span class="s1">&#39;bo-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;tri-1 mesh&#39;</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">center</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">center</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CN</span><span class="p">):</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">center</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/theory_fvm_matrix_4_0.png" src="../../_images/theory_fvm_matrix_4_0.png" />
+</div>
+</div>
+</section>
+<section id="基于网格构建方稀疏矩阵">
+<h2><span class="section-number">3.4.1.2. </span>基于网格构建方稀疏矩阵<a class="headerlink" href="#基于网格构建方稀疏矩阵" title="Link to this heading"></a></h2>
+<section id="积分方程代数化(离散化):以Laplacin算子为例">
+<h3><span class="section-number">3.4.1.2.1. </span>积分方程代数化(离散化):以Laplacin算子为例<a class="headerlink" href="#积分方程代数化(离散化):以Laplacin算子为例" title="Link to this heading"></a></h3>
+<div class="math notranslate nohighlight">
+\[\int_s \Gamma \cdot (\nabla T) ds = 0\]</div>
+<div class="math notranslate nohighlight">
+\[\Gamma \sum_{i=1}^3 \mathbf{S_i} \frac{x_P - x_{N_i}}{P-N_i} = 0\]</div>
+<p>化简，假设 <span class="math notranslate nohighlight">\(\Gamma\)</span> 为常数（对应常物性问题），则可以删去 <span class="math notranslate nohighlight">\(\Gamma\)</span> ，并令</p>
+<div class="math notranslate nohighlight">
+\[a^P_i =  -\frac{\mathbf{S_i}}{P-N_i}\]</div>
+<p>则有</p>
+<div class="math notranslate nohighlight">
+\[\sum_{i=1}^3 a^P_i (x_{N_i}-x_p) = 0\]</div>
+<p>再令</p>
+<div class="math notranslate nohighlight">
+\[a^P_P = \sum_{i=1}^3 -a^P_{N_i}\]</div>
+<p>则有</p>
+<div class="math notranslate nohighlight">
+\[a^P_P \cdot x_P + a^P_{N_1} \cdot x_{N_1} + a^P_{N_2} \cdot x_{N_2} + a^P_{N_3} \cdot x_{N_3} = 0\]</div>
+</section>
+<section id="代数方程矩阵化">
+<h3><span class="section-number">3.4.1.2.2. </span>代数方程矩阵化<a class="headerlink" href="#代数方程矩阵化" title="Link to this heading"></a></h3>
+<p>对于单元4，其与2，6，11号单元存在交界面</p>
+<div class="math notranslate nohighlight">
+\[a^4_2 \cdot x_2 + a^4_4 \cdot x_4 + a^4_6 \cdot x_6 + a^4_{11} \cdot x_{11} = 0\]</div>
+<p>或者写为</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}[a^4_2, a^4_4, a^4_6, a^4_{11}]\cdot
+\left[
+\begin{matrix}
+x_2\\
+x_4\\
+x_6\\
+x_{11}
+\end{matrix}
+\right]
+= 0\end{split}\]</div>
+<p>对于单元11，其与4,9,13号单元存在交界面，所以有</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}[a^{11}_4, a^{11}_9, a^{11}_{11}, a^{11}_{13}]\cdot
+\left[
+\begin{matrix}
+x_4\\
+x_9\\
+x_{11}\\
+x_{13}
+\end{matrix}
+\right]
+= 0\end{split}\]</div>
+</section>
+<section id="通过矩阵形式合并单元4和单元11的方程">
+<h3><span class="section-number">3.4.1.2.3. </span>通过矩阵形式合并单元4和单元11的方程<a class="headerlink" href="#通过矩阵形式合并单元4和单元11的方程" title="Link to this heading"></a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[
+\begin{matrix}
+a^4_2 &amp; a^4_4    &amp; a^4_6 &amp; 0        &amp; a^4_{11}    &amp; 0 \\
+0     &amp; a^{11}_4 &amp; 0     &amp; a^{11}_9 &amp; a^{11}_{11} &amp; a^{11}_{13}
+\end{matrix}
+\right]
+\cdot
+\left[
+\begin{matrix}
+x_2\\
+x_4\\
+x_6\\
+x_9\\
+x_{11}\\
+x_{13}
+\end{matrix}
+\right]
+=
+ \left[
+\begin{matrix}
+0\\
+0
+\end{matrix}
+\right]\end{split}\]</div>
+<p>将其余四个内部单元2，6，9，13也添加进去后，矩阵形式变为</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[
+\begin{matrix}
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; a^2_1 &amp; a^2_2 &amp; a^2_3 &amp; a^2_4 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; a^4_2 &amp; 0 &amp; a^4_4 &amp; 0 &amp; a^4_6 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a^4_{11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a^6_4 &amp; a^6_5 &amp; a^6_6 &amp; a^6_7 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a^9_8 &amp; a^9_9 &amp; a^9_{10} &amp; a^9_{11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a^{11}_4 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a^{11}_9 &amp; 0 &amp; a^{11}_{11} &amp; 0 &amp; a^{11}_{13} \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+a^{13}_{0} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a^{13}_{11} &amp; a^{13}_{12} &amp; a^{13}_{13}
+\end{matrix}
+\right]
+\cdot
+\left[
+\begin{matrix}
+x_0\\
+x_1\\
+x_2\\
+x_3\\
+x_4\\
+x_5\\
+x_6\\
+x_7\\
+x_8\\
+x_9\\
+x_{10}\\
+x_{11}\\
+x_{12}\\
+x_{13}
+\end{matrix}
+\right]
+=
+\left[
+\begin{matrix}
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0
+\end{matrix}
+\right]\end{split}\]</div>
+<p>观察系数上下标后发现，上下标分别是系数在矩阵中的行、列号，于是可以写为</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[
+\begin{matrix}
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; a_{2,1} &amp; a_{2,2} &amp; a_{2,3} &amp; a_{2,4} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; a_{4,2} &amp; 0 &amp; a_{4,4} &amp; 0 &amp; a_{4,6} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{4,11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{6,4} &amp; a_{6,5} &amp; a_{6,6} &amp; a_{6,7} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{9,8} &amp; a_{9,9} &amp; a_{9,10} &amp; a_{9,11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{11,4} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{11,9} &amp; 0 &amp; a_{11,11} &amp; 0 &amp; a_{11,13} \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+a_{13,0} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{13,11} &amp; a_{13,12} &amp; a_{13,13}
+\end{matrix}
+\right]
+\cdot
+\left[
+\begin{matrix}
+x_0\\
+x_1\\
+x_2\\
+x_3\\
+x_4\\
+x_5\\
+x_6\\
+x_7\\
+x_8\\
+x_9\\
+x_{10}\\
+x_{11}\\
+x_{12}\\
+x_{13}
+\end{matrix}
+\right]
+=
+\left[
+\begin{matrix}
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0\\
+0
+\end{matrix}
+\right]\end{split}\]</div>
+</section>
+<section id="边界单元处理">
+<h3><span class="section-number">3.4.1.2.4. </span>边界单元处理<a class="headerlink" href="#边界单元处理" title="Link to this heading"></a></h3>
+<p>对于含有边界面S的控制体0,1,3,5,7,8,10,12这8个边界单元，其在边界上不存在相邻控制体中心点N，此时可以将界面中心点视作N点来近似：</p>
+<p>以边界控制体1为例：</p>
+<div class="math notranslate nohighlight">
+\[a_{0,0} \cdot x_0 + a^P_{0,B_0} \cdot b_{B_0} + a_{0,1} \cdot x_{1} + a_{0,13} \cdot x_{13} = 0\]</div>
+<p>因为边界条件 <span class="math notranslate nohighlight">\(b_{B_0}\)</span> 已知，上市移项后有</p>
+<div class="math notranslate nohighlight">
+\[a_{0,0} \cdot x_0 + a_{0,1} \cdot x_{1} + a_{0,13} \cdot x_{13} = -a^P_{0,B_0} \cdot b_{B_0}\]</div>
+<p>令<span class="math notranslate nohighlight">\(b_0 = -a^P_{0,B_0} \cdot b_{B_0}\)</span>，则有</p>
+<div class="math notranslate nohighlight">
+\[a_{0,0} \cdot x_0 + a_{0,1} \cdot x_{1} + a_{0,13} \cdot x_{13} = b_{0}\]</div>
+<p>矩阵形式为</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[
+\begin{matrix}
+a_{0,0}, a_{0,1}, a_{0,13}
+\end{matrix}
+\right]
+\cdot
+\left[
+\begin{matrix}
+x_0\\
+x_1\\
+x_{13}
+\end{matrix}
+\right]
+= b_0\end{split}\]</div>
+<p>将边界单元的方程合并到矩阵中</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left[
+\begin{matrix}
+a_{0,0} &amp; a_{0,1} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{0,13} \\
+a_{1,0} &amp; a_{1,1} &amp; a_{1,2} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; a_{2,1} &amp; a_{2,2} &amp; a_{2,3} &amp; a_{2,4} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; a_{3,2} &amp; a_{3,3} &amp; 0 &amp; a_{3,5} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; a_{4,2} &amp; 0 &amp; a_{4,4} &amp; 0 &amp; a_{4,6} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{4,11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; a_{5,3} &amp; 0 &amp; a_{5,5} &amp; a_{5,6} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{6,4} &amp; a_{6,5} &amp; a_{6,6} &amp; a_{6,7} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{7,6} &amp; a_{7,7} &amp; a_{7,8} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{8,7} &amp; a_{8,8} &amp; a_{8,9} &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{9,8} &amp; a_{9,9} &amp; a_{9,10} &amp; a_{9,11} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{10,9} &amp; a_{10,10} &amp; 0 &amp; a_{10,12} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{11,4} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{11,9} &amp; 0 &amp; a_{11,11} &amp; 0 &amp; a_{11,13} \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{12,10} &amp; 0 &amp; a_{12,12} &amp; a_{12,13} \\
+a_{13,0} &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; a_{13,11} &amp; a_{13,12} &amp; a_{13,13}
+\end{matrix}
+\right]
+\cdot
+\left[
+\begin{matrix}
+x_0\\
+x_1\\
+x_2\\
+x_3\\
+x_4\\
+x_5\\
+x_6\\
+x_7\\
+x_8\\
+x_9\\
+x_{10}\\
+x_{11}\\
+x_{12}\\
+x_{13}
+\end{matrix}
+\right]
+=
+\left[
+\begin{matrix}
+b_{0}\\
+b_{1}\\
+0\\
+b_{3}\\
+0\\
+b_{5}\\
+0\\
+b_{7}\\
+b_{8}\\
+0\\
+b_{10}\\
+0\\
+b_{12}\\
+0
+\end{matrix}
+\right]\end{split}\]</div>
+<p>于是得到一个对称稀疏矩阵和一个与控制体（cell）数量相等的列向量</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="fvm.html" class="btn btn-neutral float-left" title="3.4. 隐式算子" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="laplacian.html" class="btn btn-neutral float-right" title="3.4.2. laplacian" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, litchi。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

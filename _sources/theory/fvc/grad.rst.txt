@@ -1,0 +1,58 @@
+grad
+=============================
+目前的梯度算子是针对压力项设置的，因此被设计为输入体积标量场，输出体积标量场。
+
+.. figure:: grad.png
+    :width: 500px
+    :alt: interpolate figure.
+    :align: center
+
+    梯度算子示意图
+
+
+最小二乘算法
+---------------
+网格中，对于控制体P可以与附近的N个网格控制体构成一个（N*2）的元方程组，
+其中N>2，因此其为一个超定方程组，对其使用最小二乘法求解(k1,k2)，
+得到其控制体P中心处的梯度。
+
+.. math::
+    :nowrap:
+    :label: grad_least
+    
+    \begin{gather*}
+    k_1(x_1^p-x_1^{N_1}) + k_2(x_2^p-x_2^{N_1}) &= V^p - V^{N_1} \\
+    k_1(x_1^p-x_1^{N_2}) + k_2(x_2^p-x_2^{N_2}) &= V^p - V^{N_2} \\
+    k_1(x_1^p-x_1^{N_3}) + k_2(x_2^p-x_2^{N_3}) &= V^p - V^{N_3}
+    \end{gather*}
+
+上式写为矩阵形式为
+
+.. math::
+    :nowrap:
+    :label: grad_least_matrix
+    
+    \begin{gather*}
+    \left[ \begin{matrix}
+    dx_1^{P,N_1} & dx_2^{P,N_1}  \\
+    dx_1^{P,N_2} & dx_2^{P,N_2}  \\
+    dx_1^{P,N_3} & dx_2^{P,N_3}  
+    \end{matrix} \right]
+    \cdot 
+    \left[ \begin{matrix}
+    k_1\\
+    k_2
+    \end{matrix} \right]
+    =
+    \left[ \begin{matrix}
+    dv^{P,N_1}\\
+    dv^{P,N_2} \\
+    dv^{P,N_3}
+    \end{matrix} \right] \end{gather*}
+
+使用最小二乘法求解上述超定方程组即可，
+上述超定方程若表述为 :math:`Mx=b` ，
+则大致流程为为：
+
+1. 两侧均左乘一个 :math:`M^T`，原方程变为 :math:`M^T\cdot Mx=M^T\cdot b`
+2. 因为方阵 :math:`M^T\cdot M` 维度很低，可以直接求逆得到 :math:`x`

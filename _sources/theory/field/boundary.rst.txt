@@ -1,0 +1,40 @@
+.. _boundary:
+
+边界条件的统一处理
+===================
+
+这里我们不讨论所谓的 Dirichlet、Neumann 和 Robin 边界条件，而是受拉格朗日插值启发，认为所谓边界条件无非是指定边界上的值、一阶导数、二阶导数和高阶导数条件，然后计算边界上的值。
+
+这里仅考虑至多一阶导数的情况（一般情况下足够工程应用），其通用数学形式为式( :math:`\ref{boundary_unity_0}` )：
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{boundary_unity_0}
+    k_{\rm{owner}} \cdot ( x_{\rm{owner}}-x_{\rm{boundary}} ) + b_{\rm{boundary}} = 0
+    \end{equation}
+
+
+式( :math:`\ref{boundary_unity_0}` ) 中： 
+
++ :math:`x_{\rm{owner}}` 为边界所在控制体的物理值
++ :math:`k_{\rm{owner}}` 为边界所在控制体的系数，其与几何场和物理场有关
++ :math:`b_{\rm{boundary}}` 为边界附加值
+
+为了便于使用，实际编码中使用下式：
+
+.. math::
+    :nowrap:
+
+    \begin{equation}
+    \label{boundary_unity_1} 
+    x_{\rm{boundary}} = k_{\rm{owner}} \cdot  x_{\rm{owner}} + b_{\rm{boundary}}
+    \end{equation}
+
+算子操作物理场时，根据需要可以通过( :math:`\ref{boundary_unity_1}` )将边界拆解为
+控制体中心值和常数两个部分，显式算子可以直接计算，隐式算子则将控制体中心值的那一部分
+包含在稀疏矩阵内，常数则添加到线性方程组右侧的 :math:`\rm{b}` 内。
+
+
+
